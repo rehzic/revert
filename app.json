@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Revert",
+    "slug": "revert",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.revert.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#7D6FCB",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.revert.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "revert",
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Revert uses your location to calculate accurate prayer times for where you are."
+        }
+      ],
+      "expo-notifications",
+      "expo-dev-client"
+    ]
+  }
+}
