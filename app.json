@@ -21,7 +21,17 @@
       "package": "com.revert.app"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "Revert",
+      "shortName": "Revert",
+      "display": "standalone",
+      "backgroundColor": "#F4F2FA",
+      "themeColor": "#7D6FCB",
+      "output": "static"
+    },
+    "experiments": {
+      "typedRoutes": false,
+      "baseUrl": "/revert"
     },
     "scheme": "revert",
     "plugins": [
