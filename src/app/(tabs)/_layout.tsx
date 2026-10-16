@@ -32,7 +32,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="qibla" options={{ title: 'Qibla', tabBarIcon: icon('⌖', '#7D6FCB') }} />
       <Tabs.Screen name="learn" options={{ title: 'Learn to Pray', tabBarIcon: icon('❖', '#A895E0') }} />
       <Tabs.Screen name="wudu" options={{ title: 'Wudu', tabBarIcon: icon('≋', '#86C4AE') }} />
-    </Tabs>
+       <Tabs.Screen name="mosques" options={{ title: 'Mosques', tabBarIcon: icon('⌂', '#8FB8E0') }} />
+   </Tabs>
   );
 }
 
