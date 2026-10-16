@@ -25,11 +25,17 @@ export default function QiblaScreen() {
     })().catch(() => setError("Couldn't get your location."));
   }, [coords]);
 
-  useEffect(() => {
-    Magnetometer.setUpdateInterval(200);
-    const sub = Magnetometer.addListener(({ x, y }) => setHeading(headingFromMagnetometer(x, y)));
-    return () => sub.remove();
+    useEffect(() => {
+    // The compass sensor isn't available in a web browser; skip it there instead of crashing.
+    try {
+      Magnetometer.setUpdateInterval(200);
+      const sub = Magnetometer.addListener(({ x, y }) => setHeading(headingFromMagnetometer(x, y)));
+      return () => sub.remove();
+    } catch {
+      return undefined;
+    }
   }, []);
+
 
   const bearing = coords ? qiblaBearing(coords.latitude, coords.longitude) : null;
   const offset = bearing !== null && heading !== null ? angleDiff(bearing, heading) : null;
