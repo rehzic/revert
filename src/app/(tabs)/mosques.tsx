@@ -37,6 +37,10 @@ function jumuahFor(name: string) {
   return JUMUAH_TIMES.find((j) => name.includes(j.match)) ?? null;
 }
 
+// Searches within this distance of The Woodlands, TX also show the hand-added mosques below.
+const WOODLANDS = { lat: 30.1658, lon: -95.4613 };
+const NEAR_WOODLANDS_KM = 40;
+
 // Mosques missing from OpenStreetMap, added by hand. They show above the search results.
 const EXTRA_MOSQUES = [
   {
@@ -121,6 +125,7 @@ export default function MosquesScreen() {
   const [mosques, setMosques] = useState<Mosque[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [nearWoodlands, setNearWoodlands] = useState(false);
 
   // Runs one lookup and shows its results, or a friendly error.
   async function run(task: () => Promise<Mosque[]>) {
@@ -143,6 +148,7 @@ export default function MosquesScreen() {
   async function useMyLocation() {
     if (settings.location) {
       const { latitude, longitude } = settings.location;
+      setNearWoodlands(distanceKm(latitude, longitude, WOODLANDS.lat, WOODLANDS.lon) < NEAR_WOODLANDS_KM);
       return run(() => findMosques(latitude, longitude));
     }
     const perm = await Location.requestForegroundPermissionsAsync();
@@ -151,7 +157,9 @@ export default function MosquesScreen() {
       return;
     }
     const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-    return run(() => findMosques(pos.coords.latitude, pos.coords.longitude));
+    const { latitude, longitude } = pos.coords;
+    setNearWoodlands(distanceKm(latitude, longitude, WOODLANDS.lat, WOODLANDS.lon) < NEAR_WOODLANDS_KM);
+    return run(() => findMosques(latitude, longitude));
   }
 
   function searchZip() {
@@ -162,6 +170,7 @@ export default function MosquesScreen() {
     }
     return run(async () => {
       const { lat, lon } = await zipToPoint(clean);
+      setNearWoodlands(distanceKm(lat, lon, WOODLANDS.lat, WOODLANDS.lon) < NEAR_WOODLANDS_KM);
       return findMosques(lat, lon);
     });
   }
@@ -193,7 +202,7 @@ export default function MosquesScreen() {
         </Pressable>
       </View>
 
-      {EXTRA_MOSQUES.map((m) => (
+      {nearWoodlands && EXTRA_MOSQUES.map((m) => (
         <View key={m.name} style={[styles.card, { backgroundColor: c.card, borderColor: c.border }]}>
           <View style={styles.row}>
             <View style={[styles.thumb, styles.thumbPlaceholder, { backgroundColor: c.accentSoft }]}>
