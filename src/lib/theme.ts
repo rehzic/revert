@@ -1,24 +1,24 @@
 import { useColorScheme } from 'react-native';
 
-// Soft palette: lavender accents on a pale background, gentle borders.
+// Garden Glow: mint background and emerald accents, with dark text for easy reading.
 const light = {
-  bg: '#F4F2FA',
-  card: '#FFFFFF',
-  text: '#2B2841',
-  muted: '#7C7897',
-  accent: '#7D6FCB',
-  accentSoft: '#EEEBFA',
-  border: '#E9E5F5',
+  bg: '#E4F5EA',
+  card: '#F5FBF7',
+  text: '#0F2A22',
+  muted: '#3E5C52',
+  accent: '#00875A',
+  accentSoft: '#CDEEDC',
+  border: '#B9E0CA',
 };
 
 const dark: typeof light = {
-  bg: '#1A1826',
-  card: '#242235',
-  text: '#EFEDF8',
-  muted: '#A29EBD',
-  accent: '#B7ABF5',
-  accentSoft: '#2E2A48',
-  border: '#33304D',
+  bg: '#0F2620',
+  card: '#173A2F',
+  text: '#EAF8F0',
+  muted: '#A9CDBD',
+  accent: '#4FD6A0',
+  accentSoft: '#214F40',
+  border: '#2A5B4A',
 };
 
 export type Colors = typeof light;
