@@ -27,6 +27,16 @@ type OverpassElement = {
 
 const SEARCH_RADIUS_METERS = 160934; // 100 miles
 
+// Jumu'ah times typed in by hand from each mosque's own website. Check them again every few months.
+const JUMUAH_TIMES: { match: string; time: string }[] = [
+  { match: "Da'wah Center", time: 'Friday 1:30 pm, doors open 12:30 (from their website, checked Oct 19, 2026)' },
+  { match: 'Cypress Islamic Center', time: '1st Jumu’ah 1:40 pm, 2nd Jumu’ah 3:20 pm (from their website, checked Oct 19, 2026)' },
+];
+
+function jumuahFor(name: string) {
+  return JUMUAH_TIMES.find((j) => name.includes(j.match))?.time ?? null;
+}
+
 // Distance in kilometres between two points on the Earth.
 function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const toRad = (d: number) => (d * Math.PI) / 180;
@@ -198,7 +208,12 @@ export default function MosquesScreen() {
               </Text>
             </View>
           </View>
-          <Text style={[styles.meta, { color: c.muted }]}>Jumu’ah times: not listed. Call the mosque to ask.</Text>
+          <Text style={[styles.meta, { color: c.muted }]}>
+            {jumuahFor(m.name) ??
+              (m.website?.startsWith('http')
+                ? 'Jumu’ah times are usually on the mosque’s website.'
+                : 'Jumu’ah times: not listed. Call the mosque to ask.')}
+          </Text>
           <View style={styles.actions}>
             <Pressable
               onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lon}`)}
@@ -213,7 +228,7 @@ export default function MosquesScreen() {
             ) : null}
             {m.website?.startsWith('http') ? (
               <Pressable onPress={() => Linking.openURL(m.website!)} style={[styles.chip, { backgroundColor: c.accentSoft }]}>
-                <Text style={[styles.chipText, { color: c.accent }]}>Website</Text>
+                <Text style={[styles.chipText, { color: c.accent }]}>Jumu’ah times</Text>
               </Pressable>
             ) : null}
           </View>
