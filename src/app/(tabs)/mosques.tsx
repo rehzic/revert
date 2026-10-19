@@ -37,6 +37,16 @@ function jumuahFor(name: string) {
   return JUMUAH_TIMES.find((j) => name.includes(j.match)) ?? null;
 }
 
+// Mosques missing from OpenStreetMap, added by hand. They show above the search results.
+const EXTRA_MOSQUES = [
+  {
+    name: 'Masjid Al-Ansar',
+    address: '15217 Sunset Trail, The Woodlands, TX 77384',
+    phone: '(832) 282-7942',
+    website: 'https://alansaarmasjid.org/',
+  },
+];
+
 // Distance in kilometres between two points on the Earth.
 function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const toRad = (d: number) => (d * Math.PI) / 180;
@@ -182,6 +192,41 @@ export default function MosquesScreen() {
           <Text style={[styles.zipButtonText, { color: c.accent }]}>Search</Text>
         </Pressable>
       </View>
+
+      {EXTRA_MOSQUES.map((m) => (
+        <View key={m.name} style={[styles.card, { backgroundColor: c.card, borderColor: c.border }]}>
+          <View style={styles.row}>
+            <View style={[styles.thumb, styles.thumbPlaceholder, { backgroundColor: c.accentSoft }]}>
+              <Text style={styles.thumbIcon}>🕌</Text>
+            </View>
+            <View style={styles.info}>
+              <Text style={[styles.name, { color: c.text }]}>{m.name}</Text>
+              <Text style={[styles.meta, { color: c.muted }]}>{m.address}</Text>
+            </View>
+          </View>
+          <Text style={[styles.meta, { color: c.muted }]}>Jumu’ah times: not listed on their website. Call the mosque to ask.</Text>
+          <View style={styles.actions}>
+            <Pressable
+              onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(m.address)}`)}
+              style={[styles.chip, { backgroundColor: c.accentSoft }]}
+            >
+              <Text style={[styles.chipText, { color: c.accent }]}>Directions</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => Linking.openURL(`https://maps.apple.com/?address=${encodeURIComponent(m.address)}`)}
+              style={[styles.chip, { backgroundColor: c.accentSoft }]}
+            >
+              <Text style={[styles.chipText, { color: c.accent }]}>Apple Maps</Text>
+            </Pressable>
+            <Pressable onPress={() => Linking.openURL(`tel:${m.phone}`)} style={[styles.chip, { backgroundColor: c.accentSoft }]}>
+              <Text style={[styles.chipText, { color: c.accent }]}>Call</Text>
+            </Pressable>
+            <Pressable onPress={() => Linking.openURL(m.website)} style={[styles.chip, { backgroundColor: c.accentSoft }]}>
+              <Text style={[styles.chipText, { color: c.accent }]}>Website</Text>
+            </Pressable>
+          </View>
+        </View>
+      ))}
 
       {loading ? <ActivityIndicator color={c.accent} /> : null}
       {error ? <Text style={[styles.error, { color: c.text }]}>{error}</Text> : null}
