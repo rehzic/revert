@@ -36,13 +36,28 @@ function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+const OVERPASS_SERVERS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+
+// Tries each public mosque-data server in turn, so one busy server doesn't stop the search.
+async function queryOverpass(query: string): Promise<{ elements: OverpassElement[] }> {
+  let lastError = 'no server replied';
+  for (const url of OVERPASS_SERVERS) {
+    try {
+      const res = await fetch(url, { method: 'POST', body: query });
+      if (res.ok) return (await res.json()) as { elements: OverpassElement[] };
+      lastError = `server returned ${res.status}`;
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : 'network error';
+    }
+  }
+  throw new Error(lastError);
+}
+
 // Finds places of worship tagged as Muslim near a point, from OpenStreetMap (free, no key needed).
 async function findMosques(lat: number, lon: number): Promise<Mosque[]> {
   const area = `(around:${SEARCH_RADIUS_METERS},${lat},${lon})`;
   const query = `[out:json][timeout:25];(node["amenity"="place_of_worship"]["religion"="muslim"]${area};way["amenity"="place_of_worship"]["religion"="muslim"]${area};);out center tags 60;`;
-  const res = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: query });
-  if (!res.ok) throw new Error('lookup failed');
-  const data = (await res.json()) as { elements: OverpassElement[] };
+  const data = await queryOverpass(query);
 
   return data.elements
     .map((el): Mosque | null => {
@@ -98,7 +113,7 @@ export default function MosquesScreen() {
       setError(
         e instanceof Error && e.message === 'zip not found'
           ? 'No place found for that zip code. Check it and try again.'
-          : "Couldn't load mosques. Check your connection and try again."
+          : `Couldn't load mosques (${e instanceof Error ? e.message : 'unknown error'}). Try again in a minute.`
       );
     } finally {
       setLoading(false);
