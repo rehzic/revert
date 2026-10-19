@@ -25,7 +25,7 @@ type OverpassElement = {
   tags?: Record<string, string>;
 };
 
-const SEARCH_RADIUS_METERS = 15000;
+const SEARCH_RADIUS_METERS = 160934; // 100 miles
 
 // Distance in kilometres between two points on the Earth.
 function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -177,17 +177,27 @@ export default function MosquesScreen() {
       {error ? <Text style={[styles.error, { color: c.text }]}>{error}</Text> : null}
       {mosques && mosques.length === 0 ? (
         <Text style={[styles.sub, { color: c.muted }]}>
-          No mosques are listed within 15 km of that place. Try a bigger city or a nearby zip code.
+          No mosques are listed within 100 miles of that place. Try a bigger city or a nearby zip code.
         </Text>
       ) : null}
 
       {mosques?.map((m) => (
         <View key={m.id} style={[styles.card, { backgroundColor: c.card, borderColor: c.border }]}>
-          {m.image ? <RNImage source={{ uri: m.image }} style={styles.photo} /> : null}
-          <Text style={[styles.name, { color: c.text }]}>{m.name}</Text>
-          <Text style={[styles.meta, { color: c.muted }]}>
-            {m.distanceKm.toFixed(1)} km away{m.address ? ` · ${m.address}` : ''}
-          </Text>
+          <View style={styles.row}>
+            {m.image ? (
+              <RNImage source={{ uri: m.image }} style={styles.thumb} />
+            ) : (
+              <View style={[styles.thumb, styles.thumbPlaceholder, { backgroundColor: c.accentSoft }]}>
+                <Text style={styles.thumbIcon}>🕌</Text>
+              </View>
+            )}
+            <View style={styles.info}>
+              <Text style={[styles.name, { color: c.text }]}>{m.name}</Text>
+              <Text style={[styles.meta, { color: c.muted }]}>
+                {(m.distanceKm * 0.621371).toFixed(1)} miles away{m.address ? ` · ${m.address}` : ''}
+              </Text>
+            </View>
+          </View>
           <Text style={[styles.meta, { color: c.muted }]}>Jumu’ah times: not listed. Call the mosque to ask.</Text>
           <View style={styles.actions}>
             <Pressable
@@ -225,8 +235,12 @@ const styles = StyleSheet.create({
   zipButtonText: { fontSize: 16, fontWeight: '600' },
   error: { fontSize: 15, fontWeight: '600' },
   card: { borderRadius: radius.card, borderWidth: 1, padding: 16, gap: 6, overflow: 'hidden' },
-  photo: { width: '100%', height: 160, borderRadius: radius.button, marginBottom: 6 },
-  name: { fontSize: 18, fontWeight: '700' },
+  row: { flexDirection: 'row', gap: 12, alignItems: 'center' },
+  thumb: { width: 72, height: 72, borderRadius: radius.button },
+  thumbPlaceholder: { alignItems: 'center', justifyContent: 'center' },
+  thumbIcon: { fontSize: 32 },
+  info: { flex: 1, minWidth: 0, gap: 2 },
+  name: { fontSize: 17, fontWeight: '700' },
   meta: { fontSize: 14, lineHeight: 20 },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   chip: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: radius.pill },
