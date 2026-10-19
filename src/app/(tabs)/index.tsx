@@ -1,7 +1,7 @@
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { requestNotificationPermission } from '@/lib/notifications';
 import { computeTimes, formatCountdown, formatTime } from '@/lib/prayerTimes';
@@ -83,6 +83,7 @@ export default function TimesScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Image source={require('../../../assets/revert-logo.png')} style={styles.logo} resizeMode="contain" />
       {next ? (
         <View style={[styles.hero, { backgroundColor: c.accent }]}>
           <Text style={styles.heroLabel}>Next prayer</Text>
@@ -178,6 +179,7 @@ export default function TimesScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 16, paddingBottom: 130, gap: 16 },
+  logo: { width: 150, height: 180, alignSelf: 'center' },
   hero: { borderRadius: 26, padding: 20, gap: 4 },
   heroLabel: { color: '#F5F3FD', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 },
   heroName: { color: '#fff', fontSize: 36, fontWeight: '700' },
