@@ -28,13 +28,13 @@ type OverpassElement = {
 const SEARCH_RADIUS_METERS = 160934; // 100 miles
 
 // Jumu'ah times typed in by hand from each mosque's own website. Check them again every few months.
-const JUMUAH_TIMES: { match: string; time: string }[] = [
-  { match: "Da'wah Center", time: 'Friday 1:30 pm, doors open 12:30 (from their website, checked Oct 19, 2026)' },
-  { match: 'Cypress Islamic Center', time: '1st Jumu’ah 1:40 pm, 2nd Jumu’ah 3:20 pm (from their website, checked Oct 19, 2026)' },
+const JUMUAH_TIMES: { match: string; times: string; checked: string }[] = [
+  { match: "Da'wah Center", times: '1:30 pm (doors open 12:30)', checked: 'Oct 19, 2026' },
+  { match: 'Cypress Islamic Center', times: '1:40 pm and 3:20 pm', checked: 'Oct 19, 2026' },
 ];
 
 function jumuahFor(name: string) {
-  return JUMUAH_TIMES.find((j) => name.includes(j.match))?.time ?? null;
+  return JUMUAH_TIMES.find((j) => name.includes(j.match)) ?? null;
 }
 
 // Distance in kilometres between two points on the Earth.
@@ -208,18 +208,31 @@ export default function MosquesScreen() {
               </Text>
             </View>
           </View>
-          <Text style={[styles.meta, { color: c.muted }]}>
-            {jumuahFor(m.name) ??
-              (m.website?.startsWith('http')
+          {jumuahFor(m.name) ? (
+            <View style={[styles.jumuah, { backgroundColor: c.accentSoft }]}>
+              <Text style={[styles.jumuahLabel, { color: c.accent }]}>JUMU’AH</Text>
+              <Text style={[styles.jumuahTime, { color: c.text }]}>{jumuahFor(m.name)?.times}</Text>
+              <Text style={[styles.meta, { color: c.muted }]}>From their website, checked {jumuahFor(m.name)?.checked}</Text>
+            </View>
+          ) : (
+            <Text style={[styles.meta, { color: c.muted }]}>
+              {m.website?.startsWith('http')
                 ? 'Jumu’ah times are usually on the mosque’s website.'
-                : 'Jumu’ah times: not listed. Call the mosque to ask.')}
-          </Text>
+                : 'Jumu’ah times: not listed. Call the mosque to ask.'}
+            </Text>
+          )}
           <View style={styles.actions}>
             <Pressable
               onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lon}`)}
               style={[styles.chip, { backgroundColor: c.accentSoft }]}
             >
               <Text style={[styles.chipText, { color: c.accent }]}>Directions</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => Linking.openURL(`https://maps.apple.com/?ll=${m.lat},${m.lon}&q=${encodeURIComponent(m.name)}`)}
+              style={[styles.chip, { backgroundColor: c.accentSoft }]}
+            >
+              <Text style={[styles.chipText, { color: c.accent }]}>Apple Maps</Text>
             </Pressable>
             {m.phone ? (
               <Pressable onPress={() => Linking.openURL(`tel:${m.phone}`)} style={[styles.chip, { backgroundColor: c.accentSoft }]}>
@@ -260,4 +273,7 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   chip: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: radius.pill },
   chipText: { fontSize: 14, fontWeight: '600' },
+  jumuah: { borderRadius: radius.button, padding: 12, gap: 2 },
+  jumuahLabel: { fontSize: 12, fontWeight: '800', letterSpacing: 1.2 },
+  jumuahTime: { fontSize: 20, fontWeight: '800' },
 });
