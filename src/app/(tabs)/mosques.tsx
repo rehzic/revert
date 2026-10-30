@@ -145,19 +145,17 @@ export default function MosquesScreen() {
     }
   }
 
+  // Uses where the phone is right now. The saved Home screen location is only a fallback,
+  // because it can be old and point somewhere else.
   async function useMyLocation() {
-    if (settings.location) {
-      const { latitude, longitude } = settings.location;
-      setNearWoodlands(distanceKm(latitude, longitude, WOODLANDS.lat, WOODLANDS.lon) < NEAR_WOODLANDS_KM);
-      return run(() => findMosques(latitude, longitude));
-    }
     const perm = await Location.requestForegroundPermissionsAsync();
-    if (!perm.granted) {
+    if (!perm.granted && !settings.location) {
       setError('Allow location to find mosques near you, or search by zip code.');
       return;
     }
-    const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-    const { latitude, longitude } = pos.coords;
+    const { latitude, longitude } = perm.granted
+      ? (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+      : settings.location!;
     setNearWoodlands(distanceKm(latitude, longitude, WOODLANDS.lat, WOODLANDS.lon) < NEAR_WOODLANDS_KM);
     return run(() => findMosques(latitude, longitude));
   }
